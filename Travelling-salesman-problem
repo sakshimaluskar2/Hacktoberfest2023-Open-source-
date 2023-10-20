@@ -1,0 +1,59 @@
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <cmath>
+
+struct Point {
+    double x, y;
+};
+
+double distance(Point a, Point b) {
+    double dx = a.x - b.x;
+    double dy = a.y - b.y;
+    return std::sqrt(dx * dx + dy * dy);
+}
+
+double totalDistance(const std::vector<Point>& points, const std::vector<int>& order) {
+    double dist = 0.0;
+    for (size_t i = 0; i < order.size() - 1; ++i) {
+        int city1 = order[i];
+        int city2 = order[i + 1];
+        dist += distance(points[city1], points[city2]);
+    }
+    dist += distance(points[order.back()], points[order.front()]); // Return to the starting city
+    return dist;
+}
+
+void printRoute(const std::vector<int>& order) {
+    for (int city : order) {
+        std::cout << city << " -> ";
+    }
+    std::cout << order.front() << std::endl;
+}
+
+int main() {
+    std::vector<Point> points = {{0.0, 0.0}, {1.0, 2.0}, {2.0, 3.0}, {3.0, 1.0}};
+    int numCities = points.size();
+
+    std::vector<int> order(numCities);
+    for (int i = 0; i < numCities; ++i) {
+        order[i] = i;
+    }
+
+    double minDistance = std::numeric_limits<double>::max();
+    std::vector<int> bestOrder;
+
+    do {
+        double dist = totalDistance(points, order);
+        if (dist < minDistance) {
+            minDistance = dist;
+            bestOrder = order;
+        }
+    } while (std::next_permutation(order.begin() + 1, order.end()));
+
+    std::cout << "Optimal TSP Route: ";
+    printRoute(bestOrder);
+    std::cout << "Total Distance: " << minDistance << std::endl;
+
+    return 0;
+}
